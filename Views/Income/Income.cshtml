@@ -1,0 +1,101 @@
+﻿@model Project.Models.Income
+
+@{
+    ViewBag.Title = "Add/Update Income";
+    var incomes = ViewBag.Incomes as List<Project.Models.Income>; // Retrieve the list of incomes
+}
+
+<h2>@(Model.Id == 0 ? "Add Income" : "Update Income")</h2>
+
+@using (Html.BeginForm("Income", "Income", FormMethod.Post))
+{
+    @Html.AntiForgeryToken() <!-- CSRF Protection -->
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.Title)
+        @Html.TextBoxFor(m => m.Title, new { @class = "form-control income-title" })
+        @Html.ValidationMessageFor(m => m.Title, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.Description)
+        @Html.TextBoxFor(m => m.Description, new { @class = "form-control income-description", @placeholder = "Optional Description" })
+        @Html.ValidationMessageFor(m => m.Description, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.Amount)
+        @Html.TextBoxFor(m => m.Amount, new { @class = "form-control income-amount", @type = "number", @step = "0.01", @placeholder = "0.00" })
+        @Html.ValidationMessageFor(m => m.Amount, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.Date)
+        @Html.TextBoxFor(m => m.Date, "{0:yyyy-MM-dd}", new { @class = "form-control income-date", @type = "date" })
+        @Html.ValidationMessageFor(m => m.Date, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.Category)
+        @Html.TextBoxFor(m => m.Category, new { @class = "form-control income-category" })
+        @Html.ValidationMessageFor(m => m.Category, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.Method)
+        @Html.TextBoxFor(m => m.Method, new { @class = "form-control income-method" })
+        @Html.ValidationMessageFor(m => m.Method, "", new { @class = "text-danger" })
+    </div>
+
+    <input type="hidden" name="Id" value="@Model.Id" />
+    <!-- Hidden field for Id -->
+
+    <button type="submit" class="btn btn-primary income-submit">@((Model.Id == 0) ? "Add Income" : "Update Income")</button>
+}
+
+<h2>Income List</h2>
+@if (incomes != null && incomes.Count > 0)
+{
+    <table class="table table-bordered mt-3">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Amount</th>
+                <th>Date</th>
+                <th>Category</th>
+                <th>Method</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in incomes)
+            {
+                <tr>
+                    <td>@item.Title</td>
+                    <td>@item.Description</td>
+                    <td>@item.Amount</td>
+                    <td>@item.Date.ToShortDateString()</td>
+                    <td>@item.Category</td>
+                    <td>@item.Method</td>
+                    <td>
+
+                        @Html.ActionLink("Update", "UpdateIncome", "Income", new { id = item.Id }, new { @class = "btn btn-warning btn-sm income-update" })
+
+                        @using (Html.BeginForm("DeleteIncome", "Income", FormMethod.Post))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.HiddenFor(m => item.Id) <!-- Assuming Id is the primary key -->
+                            <button type="submit" class="btn btn-danger btn-sm expense-delete" onclick="return confirm('Are you sure you want to delete this expense?');">Delete</button>
+                        }
+
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No incomes available.</p>
+}

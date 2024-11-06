@@ -1,0 +1,181 @@
+﻿@{
+    ViewBag.Title = "Income and Expense Overview";
+    var totalIncome = ViewBag.TotalIncome ?? 0;
+    var totalExpense = ViewBag.TotalExpense ?? 0;
+    var currentDate = DateTime.Now.ToString("MMMM dd, yyyy");
+    var currentTime = DateTime.Now.ToString("hh:mm:ss tt");
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f4f4f9;
+            color: #333;
+        }
+
+        .coontainer {
+            width: 80%;
+            margin: auto;
+            max-width: 1200px;
+            padding: 40px;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+    
+        .summary {
+            font-size: 1.4em;
+            font-weight: bold;
+            margin-bottom: 30px;
+            text-align: center;
+            color: #555;
+        }
+
+        .summary span {
+            font-size: 1.5em;
+        }
+
+        .summary .income {
+            color: #4caf50; /* Green for income */
+        }
+
+        .summary .expense {
+            color: #f44336; /* Red for expense */
+        }
+
+        .chart-container {
+            width: 80%;
+            margin: auto;
+            text-align: center;
+        }
+
+        .filters {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .filters select {
+            font-size: 1.2em;
+            padding: 5px;
+            margin-right: 20px;
+        }
+
+        .date-time {
+            font-size: 1.2em;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        
+
+       
+    </style>
+
+    <!-- Include Chart.js from CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <div class="coontainer">
+
+        <!-- Display Current Date and Time -->
+        <div class="date-time">
+            <div>Today's Date: <strong>@currentDate</strong></div>
+            <div>Current Time: <strong>@currentTime</strong></div>
+        </div>
+
+        <!-- Filters for Daily, Weekly, Monthly -->
+        <div class="filters">
+            <select id="filter" onchange="updateChart()">
+                <option value="daily">Daily</option>
+                <option value="weekly">Weekly</option>
+                <option value="monthly">Monthly</option>
+            </select>
+            <span>Select a filter: </span>
+        </div>
+
+        <!-- Title of the Page -->
+        <h2>@ViewBag.Title</h2>
+
+        <!-- Income and Expense Summary -->
+        <div class="summary">
+            Total Income: <span class="income">$@totalIncome</span><br>
+            Total Expense: <span class="expense">$@totalExpense</span>
+        </div>
+
+        <!-- Pie Chart Container -->
+        <div class="chart-container">
+            <canvas id="incomeExpenseChart"></canvas>
+        </div>
+
+        <!-- Footer Section -->
+        <div class="footer">
+            <p>Income and Expense Overview - Powered by Your Company</p>
+        </div>
+
+    </div>
+
+    <!-- Chart.js Script for Pie Chart -->
+    <script>
+        var ctx = document.getElementById('incomeExpenseChart').getContext('2d');
+
+        // Initial Chart Data
+        var chartData = {
+            daily: [@totalIncome, @totalExpense],  // Replace this with dynamic data based on the date
+            weekly: [@totalIncome, @totalExpense],  // Replace with actual weekly data
+            monthly: [@totalIncome, @totalExpense],  // Replace with actual monthly data
+        };
+
+        var incomeExpenseChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['Income', 'Expense'],
+                datasets: [{
+                    data: chartData.daily, // Default to daily
+                    backgroundColor: ['#4caf50', '#f44336'], // Green for income, red for expense
+                    hoverBackgroundColor: ['#66bb6a', '#e57373']
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                label += '$' + context.raw.toLocaleString();
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Function to Update Chart based on selected filter
+        function updateChart() {
+            var filter = document.getElementById('filter').value;
+            var newData = chartData[filter];  // Get the data for the selected filter
+
+            incomeExpenseChart.data.datasets[0].data = newData;
+            incomeExpenseChart.update();
+        }
+    </script>
+
+</body>
+</html>
